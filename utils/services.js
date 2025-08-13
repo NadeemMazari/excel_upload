@@ -3,29 +3,18 @@ const fs = require('fs');
 const { Pool } = require('pg');
 const path = require('path');
 const copyFrom = require('pg-copy-streams').from;
+require('dotenv').config();
+// const pool = new Pool({ connectionString: 'postgres://postgres:mazari@localhost/taskdb' });
 
-const pool = new Pool({ connectionString: 'postgres://postgres:mazari@localhost/taskdb' });
+const pool = new Pool({
+  user: process.env.PG_USER,
+  password: process.env.PG_PASSWORD,
+  host: process.env.PG_HOST,
+  port: process.env.PG_PORT,
+  database: process.env.PG_DATABASE
+});
 
-// async function importCSV(filePath, tableName) {
 
-//   console.log("importing CSV....");
-  
-
-//   const quotedTable = `"${tableName}"`;
-//   const client = await pool.connect();
-//   try {
-//     const stream = client.query(copyFrom(`COPY ${quotedTable} FROM STDIN WITH CSV HEADER`));
-//     const fileStream = fs.createReadStream(filePath);
-//     fileStream.pipe(stream).on('finish', () => {
-//       console.log('Import completed!');
-//       // unlink(filePath)
-//       client.release();
-//     });
-//   } catch (err) {
-//     console.error('Error importing', err);
-//     client.release();
-//   }
-// }
 
 async function importCSV(filePath, tableName, headers) {
   console.log("Importing CSV...");

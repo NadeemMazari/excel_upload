@@ -6,6 +6,7 @@ const fs = require('fs');
 const app = express();
 const PORT = 4000;
 const csv = require('csv-parser');
+require('dotenv').config();
 const {importCSV, unlink, createTableIfNotExists}= require('./utils/services')
 // Storage config for Multer
 const storage = multer.diskStorage({
