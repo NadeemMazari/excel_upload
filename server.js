@@ -34,7 +34,12 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({ storage, fileFilter });
 
 
-app.post('test/upload', upload.single('file'), async (req, res) => {
+
+
+
+
+
+app.post('/test/upload', upload.single('file'), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ message: 'No file uploaded' });
@@ -88,6 +93,10 @@ app.post('test/upload', upload.single('file'), async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+app.get('/test', (req, res)=>{
+res.send("server is running")
+})
 
 
 app.listen(PORT, () => {
