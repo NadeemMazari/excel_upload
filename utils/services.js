@@ -1,18 +1,11 @@
 
 const fs = require('fs');
-const { Pool } = require('pg');
+const pool= require('./../databaseConnection')
 const path = require('path');
 const copyFrom = require('pg-copy-streams').from;
 require('dotenv').config();
 // const pool = new Pool({ connectionString: 'postgres://postgres:mazari@localhost/taskdb' });
 
-const pool = new Pool({
-  user: process.env.PG_USER,
-  password: process.env.PG_PASSWORD,
-  host: process.env.PG_HOST,
-  port: process.env.PG_PORT,
-  database: process.env.PG_DATABASE
-});
 
 
 
@@ -46,10 +39,13 @@ async function importCSV(filePath, tableName, headers) {
 
     stream.on('finish', () => {
       console.log('✅ Import completed!');
+
       fs.unlink(filePath, (err) => {
         if (err) console.error('❌ File delete error:', err);
       });
       client.release();
+
+      
     });
 
     fileStream.pipe(stream);

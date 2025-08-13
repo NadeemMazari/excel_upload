@@ -5,8 +5,15 @@ const XLSX = require('xlsx');
 const fs = require('fs');
 const app = express();
 const PORT = 4000;
-const csv = require('csv-parser');
 require('dotenv').config();
+const pool= require('./databaseConnection')
+const cors = require('cors');
+app.use(cors());
+
+let tableName=process.env.TABLENAME||"MYDATA"
+
+const csv = require('csv-parser');
+
 const {importCSV, unlink, createTableIfNotExists}= require('./utils/services')
 // Storage config for Multer
 const storage = multer.diskStorage({
@@ -78,7 +85,7 @@ app.post('/test/upload', upload.single('file'), async (req, res) => {
             .on('headers', async (headerList) => {
                 headers.push(...headerList);
                
-                await createTableIfNotExists('MYDATA', headers, csvFilename);
+                await createTableIfNotExists(tableName, headers, csvFilename);
             })
 
         console.log("deleting orignal file");
@@ -86,13 +93,52 @@ app.post('/test/upload', upload.single('file'), async (req, res) => {
    
 
         res.json({
-            message: 'Excel file converted to CSV and stored successfully',
-            csvFile: csvFilename
+            success:true,
+            message: 'Excel file imported successfully',
+         
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
+
+
+
+
+app.get('/test/get-data', async (req, res) => {
+  try {
+    // Read query parameters
+    let { page, limit } = req.query;
+    page = parseInt(page) || 1;
+    limit = parseInt(limit) || 10;
+
+    const offset = (page - 1) * limit;
+
+    // Get paginated data
+    const result = await pool.query(
+      `SELECT * FROM MYDATA LIMIT $1 OFFSET $2`,
+      [limit, offset]
+    );
+
+    // Get total count
+    const countResult = await pool.query(`SELECT COUNT(*) FROM MYDATA`);
+    const total = parseInt(countResult.rows[0].count);
+
+    res.json({
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+      data: result.rows
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Database query failed' });
+  }
+})
+
+
+
 
 app.get('/test', (req, res)=>{
 res.send("server is running")
