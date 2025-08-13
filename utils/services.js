@@ -4,9 +4,6 @@ const pool= require('./../databaseConnection')
 const path = require('path');
 const copyFrom = require('pg-copy-streams').from;
 require('dotenv').config();
-// const pool = new Pool({ connectionString: 'postgres://postgres:mazari@localhost/taskdb' });
-
-
 
 
 async function importCSV(filePath, tableName, headers) {
@@ -61,7 +58,7 @@ async function importCSV(filePath, tableName, headers) {
  function unlink(filePath) {
   try {
   let resp=  fs.unlinkSync(filePath, (result)=>{
-      console.log(result);
+    
       
   })
     // console.log(resp);
@@ -72,34 +69,9 @@ async function importCSV(filePath, tableName, headers) {
   }
 }
 
-
-
-// async function createTableIfNotExists(tableName, headers) {
-//     // Check if table exists
-//     const checkQuery = `
-//         SELECT EXISTS (
-//             SELECT FROM information_schema.tables 
-//             WHERE table_schema = 'public' 
-//             AND table_name = $1
-//         )
-//     `;
-//     const { rows } = await pool.query(checkQuery, [tableName]);
-
-//     if (!rows[0].exists) {
-//         // Build CREATE TABLE query
-//         const columns = headers.map(h => `"${h}" TEXT`).join(', ');
-//         const createQuery = `CREATE TABLE "${tableName}" (${columns});`;
-//         await pool.query(createQuery);
-//         console.log(`✅ Table "${tableName}" created successfully`);
-//     } else {
-//         console.log(`ℹ️ Table "${tableName}" already exists`);
-//     }
-// }
-
 async function createTableIfNotExists(tableName, headers, csvFilename) {
 
-  console.log(headers);
-  
+
     // Check if table exists
     const checkQuery = `
         SELECT EXISTS (

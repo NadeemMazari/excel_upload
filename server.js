@@ -10,7 +10,7 @@ const pool= require('./databaseConnection')
 const cors = require('cors');
 app.use(cors());
 
-let tableName=process.env.TABLENAME||"MYDATA"
+let tableName=process.env.TABLENAME||"datatable"
 
 const csv = require('csv-parser');
 
@@ -116,12 +116,12 @@ app.get('/test/get-data', async (req, res) => {
 
     // Get paginated data
     const result = await pool.query(
-      `SELECT * FROM MYDATA LIMIT $1 OFFSET $2`,
+      `SELECT * FROM ${tableName} LIMIT $1 OFFSET $2`,
       [limit, offset]
     );
 
     // Get total count
-    const countResult = await pool.query(`SELECT COUNT(*) FROM MYDATA`);
+    const countResult = await pool.query(`SELECT COUNT(*) FROM ${tableName}`);
     const total = parseInt(countResult.rows[0].count);
 
     res.json({
@@ -133,7 +133,7 @@ app.get('/test/get-data', async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Database query failed' });
+    res.status(500).json({ error: err.message });
   }
 })
 
